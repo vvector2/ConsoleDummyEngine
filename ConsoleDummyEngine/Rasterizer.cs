@@ -78,7 +78,7 @@ namespace ConsoleDummyEngine
                 }
             }
 
-            frameBuffer.Flush();
+            frameBuffer.Flush(minX, minY, maxX, maxY);
         }
 
         private void DrawLine(Point3D p1, Point3D p2, int color = 4,

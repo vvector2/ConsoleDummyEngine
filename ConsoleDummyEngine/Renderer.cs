@@ -102,9 +102,8 @@ namespace ConsoleDummyEngine
                 {
                     DrawMesh(mesh);
                 }
-                
+
                 frameBuffer.Render();
-                Thread.Sleep(1000 / 30);
                 frameBuffer.ClearBuffer();
             }
         }

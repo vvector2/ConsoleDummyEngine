@@ -52,8 +52,12 @@ namespace ConsoleDummyEngine
 
         public void Flush()
         {
-            for (int i = 0; i < width; i++)
-            for (int j = 0; j < height; j++)
+            Flush(0, 0, width -1, height -1);
+        }
+        public void Flush(int x0, int y0 , int x1, int y1)
+        {
+            for (int i = x0; i <= x1; i++)
+            for (int j = y0; j <= y1; j++)
                 if (tmpBuffer[i, j].set && (!buffer[i, j].set || tmpBuffer[i, j].zBuffer < buffer[i, j].zBuffer))
                     buffer[i, j] = tmpBuffer[i, j];
 
