@@ -26,9 +26,9 @@ namespace ConsoleDummyEngine
 
         public void DrawFillTriangle(Point3D p12D, Point3D p22D, Point3D p32D, int color)
         {
-            DrawLine(p12D, p22D, 0);
-            DrawLine(p22D, p32D, 0);
-            DrawLine(p32D, p12D, 0);
+            DrawLine(p12D, p22D, color);
+            DrawLine(p22D, p32D, color);
+            DrawLine(p32D, p12D, color);
 
             var tmpBuffer = frameBuffer.GetTmpBuffer();
 
@@ -87,6 +87,13 @@ namespace ConsoleDummyEngine
         private void DrawLine(Point3D p1, Point3D p2, int color = 4,
             ConsoleCharacter consoleCharacter = ConsoleCharacter.Full)
         {
+            if (p2.X - p1.X < 0)
+            {
+                Point3D temp = p1;
+                p1 = p2;
+                p2 = temp;
+            }
+            
             var deltaX = p2.X - p1.X;
             var deltaY = p2.Y - p1.Y;
 
@@ -108,6 +115,7 @@ namespace ConsoleDummyEngine
                 currentPoint.X += incrementX;
                 currentPoint.Y += incrementY;
             }
+            frameBuffer.SetPixel(p2.FloorTo2D(), p2.Z, color, consoleCharacter);
         }
     }
 }
