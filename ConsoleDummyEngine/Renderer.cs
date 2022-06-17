@@ -17,7 +17,7 @@ namespace ConsoleDummyEngine
         private const double TOP = 1.5;
         private const double BOTTOM = -1.5;
 
-        private const double FOE = 60;
+        private const double FOE = 80;
         
         private readonly int width = 203;
         private readonly int height = 203;
@@ -50,24 +50,26 @@ namespace ConsoleDummyEngine
         {
             var xClip = p.X;
             var yClip = p.Y;
+            var zClip = (p.Z - NEAR) / (FAR - NEAR);
             
             var xNdc = 0.5 + xClip / ((RIGHT - LEFT) / 2);
             var yNdc = 0.5 - yClip / ((TOP - BOTTOM) / 2);
 
-            return new Point3D(xNdc * width, yNdc * height, p.Z);
+            return new Point3D(xNdc * width, yNdc * height, zClip);
         }
         
         private Point3D ProjectionPerspective(Point3D p)
         {
-            var xClip = (NEAR / p.Z) * p.X;
-            var yClip = (NEAR / p.Z) * p.Y;
+            var xClip = NEAR * p.X / p.Z;
+            var yClip = NEAR * p.Y / p.Z;
+            var zClip = (FAR * p.Z - FAR * NEAR )  / (FAR - NEAR) / p.Z;
             
             var halfFrustumSquare = Math.Tan(FOE / 2 * Math.PI / 180) * NEAR;
             
             var xNdc = 0.5 + xClip / halfFrustumSquare;
             var yNdc = 0.5 - yClip / halfFrustumSquare;
 
-            return new Point3D(xNdc * width, yNdc * height, p.Z);
+            return new Point3D(xNdc * width, yNdc * height, zClip);
         }
 
         private void DrawMesh(Mesh mesh)
@@ -75,9 +77,9 @@ namespace ConsoleDummyEngine
             var triangles = mesh.GetWorldTriangles();
             foreach (var tri in triangles)
             {
-                var p1 = ProjectionOrthographic(tri.p1);
-                var p2 = ProjectionOrthographic(tri.p2);
-                var p3 = ProjectionOrthographic(tri.p3);
+                var p1 = ProjectionPerspective(tri.p1);
+                var p2 = ProjectionPerspective(tri.p2);
+                var p3 = ProjectionPerspective(tri.p3);
                 
                 if (mesh.WireFrame)
                     rasterizer.DrawWireframeTriangle(p1,p2,p3);

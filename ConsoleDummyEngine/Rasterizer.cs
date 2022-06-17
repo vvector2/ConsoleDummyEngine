@@ -19,16 +19,16 @@ namespace ConsoleDummyEngine
         {
             DrawLine(p1, p2);
             DrawLine(p2, p3);
-            DrawLine(p1, p3);
+            DrawLine(p3, p1);
 
             frameBuffer.Flush();
         }
 
         public void DrawFillTriangle(Point3D p12D, Point3D p22D, Point3D p32D, int color)
         {
-            DrawLine(p12D, p22D, color);
-            DrawLine(p22D, p32D, color);
-            DrawLine(p32D, p12D, color);
+            DrawLine(p12D, p22D, 0);
+            DrawLine(p22D, p32D, 0);
+            DrawLine(p32D, p12D, 0);
 
             var tmpBuffer = frameBuffer.GetTmpBuffer();
 
@@ -37,6 +37,9 @@ namespace ConsoleDummyEngine
             for (int j = 0; j < frameBuffer.height; j++)
                 if (tmpBuffer[i, j].set)
                     listPoint.Add(new Point(i, j));
+            
+            if (listPoint.Count == 0)
+                return;
 
             var minX = listPoint.Select(p => p.X).Min();
             var minY = listPoint.Select(p => p.Y).Min();
@@ -84,13 +87,6 @@ namespace ConsoleDummyEngine
         private void DrawLine(Point3D p1, Point3D p2, int color = 4,
             ConsoleCharacter consoleCharacter = ConsoleCharacter.Full)
         {
-            if (p2.X - p1.X < 0)
-            {
-                Point3D temp = p1;
-                p1 = p2;
-                p2 = temp;
-            }
-
             var deltaX = p2.X - p1.X;
             var deltaY = p2.Y - p1.Y;
 
