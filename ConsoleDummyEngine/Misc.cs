@@ -37,12 +37,12 @@ namespace ConsoleDummyEngine
     
     public struct Triangle
     {
-        public Point3D p1;
-        public Point3D p2;
-        public Point3D p3;
+        public Vector3D p1;
+        public Vector3D p2;
+        public Vector3D p3;
         public int color;
 
-        public Triangle(Point3D p1, Point3D p2, Point3D p3, int color = 0)
+        public Triangle(Vector3D p1, Vector3D p2, Vector3D p3, int color = 0)
         {
             this.p1 = p1;
             this.p2 = p2;
@@ -53,55 +53,56 @@ namespace ConsoleDummyEngine
         public Triangle Transform(Matrix3D m)
         {
             var tri = this;
-            tri.p1 = m.Transform(tri.p1);
-            tri.p2 = m.Transform(tri.p2);
-            tri.p3 = m.Transform(tri.p3);
+            tri.p1 = m.Transform3D(tri.p1);
+            tri.p2 = m.Transform3D(tri.p2);
+            tri.p3 = m.Transform3D(tri.p3);
             return tri;
         }
     }
     
     public static class Helpers
     {
-        public static Point3D Clone(this Point3D p) => new Point3D(p.X, p.Y, p.Z);
-        public static Point FloorTo2D(this Point3D p) => new Point((int)Math.Floor(p.X), (int)Math.Floor(p.Y));
+        public static Vector3D Transform3D(this Matrix3D m, Vector3D v) => m.Transform(v) + new Vector3D(m.OffsetX, m.OffsetY, m.OffsetZ);
+
+        public static Point FloorTo2D(this Vector3D p) => new Point((int)Math.Floor(p.X), (int)Math.Floor(p.Y));
         
         public static Mesh GetBox(double size)
         {
             //front
-            var tri1 = new Triangle(new Point3D(-size / 2, 0, 0), new Point3D(size / 2, 0, 0),
-                new Point3D(size / 2, size, 0), 1);
-            var tri2 = new Triangle(new Point3D(-size / 2, 0, 0), new Point3D(size / 2, size, 0),
-                new Point3D(-size / 2, size, 0), 1);
+            var tri1 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, 0, 0),
+                new Vector3D(size / 2, size, 0), 1);
+            var tri2 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, size, 0),
+                new Vector3D(-size / 2, size, 0), 1);
 
             //top
-            var tri3 = new Triangle(new Point3D(-size / 2, size, 0), new Point3D(size / 2, size, 0),
-                new Point3D(size / 2, size, size), 2);
-            var tri4 = new Triangle(new Point3D(-size / 2, size, 0), new Point3D(size / 2, size, size),
-                new Point3D(-size / 2, size, size), 2);
+            var tri3 = new Triangle(new Vector3D(-size / 2, size, 0), new Vector3D(size / 2, size, 0),
+                new Vector3D(size / 2, size, size), 2);
+            var tri4 = new Triangle(new Vector3D(-size / 2, size, 0), new Vector3D(size / 2, size, size),
+                new Vector3D(-size / 2, size, size), 2);
 
             //bottom
-            var tri5 = new Triangle(new Point3D(-size / 2, 0, 0), new Point3D(size / 2, 0, 0),
-                new Point3D(size / 2, 0, size), 3);
-            var tri6 = new Triangle(new Point3D(-size / 2, 0, 0), new Point3D(size / 2, 0, size),
-                new Point3D(-size / 2, 0, size), 3);
+            var tri5 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, 0, 0),
+                new Vector3D(size / 2, 0, size), 3);
+            var tri6 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, 0, size),
+                new Vector3D(-size / 2, 0, size), 3);
 
             //back
-            var tri7 = new Triangle(new Point3D(-size / 2, 0, size), new Point3D(size / 2, 0, size),
-                new Point3D(size / 2, size, size), 4);
-            var tri8 = new Triangle(new Point3D(-size / 2, 0, size), new Point3D(size / 2, size, size),
-                new Point3D(-size / 2, size, size), 4);
+            var tri7 = new Triangle(new Vector3D(-size / 2, 0, size), new Vector3D(size / 2, 0, size),
+                new Vector3D(size / 2, size, size), 4);
+            var tri8 = new Triangle(new Vector3D(-size / 2, 0, size), new Vector3D(size / 2, size, size),
+                new Vector3D(-size / 2, size, size), 4);
 
             // //left
-            var tri9 = new Triangle(new Point3D(-size / 2, 0, 0), new Point3D(-size / 2, 0, size),
-                new Point3D(-size / 2, size, 0), 5);
-            var tri10 = new Triangle(new Point3D(-size / 2, size, size), new Point3D(-size / 2, 0, size),
-                new Point3D(-size / 2, size, 0), 5);
+            var tri9 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(-size / 2, 0, size),
+                new Vector3D(-size / 2, size, 0), 5);
+            var tri10 = new Triangle(new Vector3D(-size / 2, size, size), new Vector3D(-size / 2, 0, size),
+                new Vector3D(-size / 2, size, 0), 5);
 
             //right
-            var tri11 = new Triangle(new Point3D(size / 2, 0, 0), new Point3D(size / 2, 0, size),
-                new Point3D(size / 2, size, 0), 6);
-            var tri12 = new Triangle(new Point3D(size / 2, size, size), new Point3D(size / 2, 0, size),
-                new Point3D(size / 2, size, 0), 6);
+            var tri11 = new Triangle(new Vector3D(size / 2, 0, 0), new Vector3D(size / 2, 0, size),
+                new Vector3D(size / 2, size, 0), 6);
+            var tri12 = new Triangle(new Vector3D(size / 2, size, size), new Vector3D(size / 2, 0, size),
+                new Vector3D(size / 2, size, 0), 6);
 
             var mesh = new Mesh(new List<Triangle>()
                 { tri1, tri2, tri3, tri4, tri5, tri6, tri7, tri8, tri9, tri10, tri11, tri12 });

@@ -15,7 +15,7 @@ namespace ConsoleDummyEngine
             this.frameBuffer = frameBuffer;
         }
 
-        public void DrawWireframeTriangle(Point3D p1, Point3D p2, Point3D p3)
+        public void DrawWireframeTriangle(Vector3D p1, Vector3D p2, Vector3D p3)
         {
             DrawLine(p1, p2);
             DrawLine(p2, p3);
@@ -24,7 +24,7 @@ namespace ConsoleDummyEngine
             frameBuffer.Flush();
         }
 
-        public void DrawFillTriangle(Point3D p12D, Point3D p22D, Point3D p32D, int color)
+        public void DrawFillTriangle(Vector3D p12D, Vector3D p22D, Vector3D p32D, int color)
         {
             DrawLine(p12D, p22D, color);
             DrawLine(p22D, p32D, color);
@@ -84,12 +84,12 @@ namespace ConsoleDummyEngine
             frameBuffer.Flush(minX, minY, maxX, maxY);
         }
 
-        private void DrawLine(Point3D p1, Point3D p2, int color = 4,
+        private void DrawLine(Vector3D p1, Vector3D p2, int color = 4,
             ConsoleCharacter consoleCharacter = ConsoleCharacter.Full)
         {
             if (p2.X - p1.X < 0)
             {
-                Point3D temp = p1;
+                Vector3D temp = p1;
                 p1 = p2;
                 p2 = temp;
             }
@@ -105,7 +105,7 @@ namespace ConsoleDummyEngine
             var incrementX = deltaX / steps;
             var incrementY = deltaY / steps;
 
-            var currentPoint = p1.Clone();
+            var currentPoint = p1;
             for (var i = 0; i <= steps; i++)
             {
                 var drawPoint = currentPoint.FloorTo2D();

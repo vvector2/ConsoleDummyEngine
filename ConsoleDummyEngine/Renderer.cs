@@ -46,7 +46,7 @@ namespace ConsoleDummyEngine
             consoleEngine.Borderless();
         }
         
-        private Point3D ProjectionOrthographic(Point3D p)
+        private Vector3D ProjectionOrthographic(Vector3D p)
         {
             var xClip = p.X;
             var yClip = p.Y;
@@ -55,10 +55,10 @@ namespace ConsoleDummyEngine
             var xNdc = 0.5 + xClip / ((RIGHT - LEFT) / 2);
             var yNdc = 0.5 - yClip / ((TOP - BOTTOM) / 2);
 
-            return new Point3D(xNdc * width, yNdc * height, zClip);
+            return new Vector3D(xNdc * width, yNdc * height, zClip);
         }
         
-        private Point3D ProjectionPerspective(Point3D p)
+        private Vector3D ProjectionPerspective(Vector3D p)
         {
             var xClip = NEAR * p.X / p.Z;
             var yClip = NEAR * p.Y / p.Z;
@@ -69,7 +69,7 @@ namespace ConsoleDummyEngine
             var xNdc = 0.5 + xClip / halfFrustumSquare;
             var yNdc = 0.5 - yClip / halfFrustumSquare;
 
-            return new Point3D(xNdc * width, yNdc * height, zClip);
+            return new Vector3D(xNdc * width, yNdc * height, zClip);
         }
 
         private void DrawMesh(Mesh mesh)
