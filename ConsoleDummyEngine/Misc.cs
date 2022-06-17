@@ -11,14 +11,15 @@ namespace ConsoleDummyEngine
         private readonly IEnumerable<Triangle> triangles;
         public Matrix3D matrix3D = Matrix3D.Identity;
         public bool WireFrame { get; set; }
-        
+
         public Mesh(IEnumerable<Triangle> triangles)
         {
             this.triangles = triangles;
         }
+
         public IEnumerable<Triangle> GetWorldTriangles() => triangles.Select(tri => tri.Transform(matrix3D));
     }
-    
+
     public struct PixelInfo
     {
         public PixelInfo(float zBuffer, int color, ConsoleCharacter consoleCharacter = ConsoleCharacter.Full)
@@ -28,13 +29,14 @@ namespace ConsoleDummyEngine
             this.consoleCharacter = consoleCharacter;
             set = false;
         }
+
         public bool set;
         public double zBuffer;
         public int color;
         public ConsoleCharacter consoleCharacter;
     }
-    
-    
+
+
     public struct Triangle
     {
         public Vector3D p1;
@@ -59,60 +61,82 @@ namespace ConsoleDummyEngine
             return tri;
         }
     }
-    
+
     public static class Helpers
     {
-        public static Vector3D Transform3D(this Matrix3D m, Vector3D v) => m.Transform(v) + new Vector3D(m.OffsetX, m.OffsetY, m.OffsetZ);
+        public static Vector3D Transform3D(this Matrix3D m, Vector3D v) =>
+            m.Transform(v) + new Vector3D(m.OffsetX, m.OffsetY, m.OffsetZ);
 
         public static Point FloorTo2D(this Vector3D p) => new Point((int)Math.Floor(p.X), (int)Math.Floor(p.Y));
-        
+
         public static Mesh GetBox(double size)
         {
+            var a = size / 2;
+
             //front
-            var tri1 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, 0, 0),
-                new Vector3D(size / 2, size, 0), 1);
-            var tri2 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, size, 0),
-                new Vector3D(-size / 2, size, 0), 1);
+            var tri1 = new Triangle(
+                new Vector3D(-a, -a, -a),
+                new Vector3D(-a, a, -a),
+                new Vector3D(a, a, -a), 1);
+            var tri2 = new Triangle(
+                new Vector3D(-a, -a, -a),
+                new Vector3D(a, a, -a),
+                new Vector3D(a, -a, -a), 1);
 
             //top
-            var tri3 = new Triangle(new Vector3D(-size / 2, size, 0), new Vector3D(size / 2, size, 0),
-                new Vector3D(size / 2, size, size), 2);
-            var tri4 = new Triangle(new Vector3D(-size / 2, size, 0), new Vector3D(size / 2, size, size),
-                new Vector3D(-size / 2, size, size), 2);
+            var tri3 = new Triangle(
+                new Vector3D(-a, a, -a),
+                new Vector3D(-a, a, a),
+                new Vector3D(a, a, a), 2);
+            var tri4 = new Triangle(
+                new Vector3D(a, a, -a),
+                new Vector3D(-a, a, -a),
+                new Vector3D(a, a, a), 2);
 
             //bottom
-            var tri5 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, 0, 0),
-                new Vector3D(size / 2, 0, size), 3);
-            var tri6 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(size / 2, 0, size),
-                new Vector3D(-size / 2, 0, size), 3);
+            var tri5 = new Triangle(
+                new Vector3D(-a, -a, a),
+                new Vector3D(-a, -a, -a),
+                new Vector3D(a, -a, a), 3);
+            var tri6 = new Triangle(
+                new Vector3D(-a, -a, -a),
+                new Vector3D(a, -a, -a),
+                new Vector3D(a, -a, a), 3);
 
             //back
-            var tri7 = new Triangle(new Vector3D(-size / 2, 0, size), new Vector3D(size / 2, 0, size),
-                new Vector3D(size / 2, size, size), 4);
-            var tri8 = new Triangle(new Vector3D(-size / 2, 0, size), new Vector3D(size / 2, size, size),
-                new Vector3D(-size / 2, size, size), 4);
+            var tri7 = new Triangle(
+                new Vector3D(-a, a, a),
+                new Vector3D(-a, -a, a),
+                new Vector3D(a, a, a), 4);
+            var tri8 = new Triangle(
+                new Vector3D(a, a, a),
+                new Vector3D(-a, -a, a),
+                new Vector3D(a, -a, a), 4);
 
             // //left
-            var tri9 = new Triangle(new Vector3D(-size / 2, 0, 0), new Vector3D(-size / 2, 0, size),
-                new Vector3D(-size / 2, size, 0), 5);
-            var tri10 = new Triangle(new Vector3D(-size / 2, size, size), new Vector3D(-size / 2, 0, size),
-                new Vector3D(-size / 2, size, 0), 5);
+            var tri9 = new Triangle(
+                new Vector3D(-a, -a, -a),
+                new Vector3D(-a, -a, a),
+                new Vector3D(-a, a, -a), 5);
+            var tri10 = new Triangle(
+                new Vector3D(-a, -a, a),
+                new Vector3D(-a, a, a),
+                new Vector3D(-a, a, -a), 5);
 
             //right
-            var tri11 = new Triangle(new Vector3D(size / 2, 0, 0), new Vector3D(size / 2, 0, size),
-                new Vector3D(size / 2, size, 0), 6);
-            var tri12 = new Triangle(new Vector3D(size / 2, size, size), new Vector3D(size / 2, 0, size),
-                new Vector3D(size / 2, size, 0), 6);
+            var tri11 = new Triangle(
+                new Vector3D(a, -a, a),
+                new Vector3D(a, -a, -a),
+                new Vector3D(a, a, -a), 6);
+            var tri12 = new Triangle(
+                new Vector3D(a, a, a),
+                new Vector3D(a, -a, a),
+                new Vector3D(a, a, -a), 6);
 
             var mesh = new Mesh(new List<Triangle>()
                 { tri1, tri2, tri3, tri4, tri5, tri6, tri7, tri8, tri9, tri10, tri11, tri12 });
-            mesh.matrix3D.OffsetZ = -size / 2;
-            mesh.matrix3D.OffsetY = -size / 2;
-            mesh = new Mesh(mesh.GetWorldTriangles());
 
             return mesh;
         }
     }
-    
-    
 }

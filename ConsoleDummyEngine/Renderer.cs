@@ -28,6 +28,7 @@ namespace ConsoleDummyEngine
 
         private readonly List<Mesh> meshes = new List<Mesh>();
 
+        private readonly Vector3D cameraVector = new Vector3D();
         
         public delegate void BeforeRender();
         public BeforeRender beforeRender;
@@ -77,6 +78,14 @@ namespace ConsoleDummyEngine
             var triangles = mesh.GetWorldTriangles();
             foreach (var tri in triangles)
             {
+                var crossTri = Vector3D.CrossProduct(tri.p2 - tri.p1,  tri.p3 - tri.p1);
+                var cameraV = cameraVector - tri.p1 ;
+
+                var cameraDotProduct = Vector3D.DotProduct(crossTri, cameraV);
+                
+                if (cameraDotProduct < 0)
+                    continue;
+
                 var p1 = ProjectionPerspective(tri.p1);
                 var p2 = ProjectionPerspective(tri.p2);
                 var p3 = ProjectionPerspective(tri.p3);
