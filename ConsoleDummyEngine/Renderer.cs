@@ -40,6 +40,8 @@ namespace ConsoleDummyEngine
             consoleEngine = new ConsoleEngine(width, height, 4, 3);
             frameBuffer = new FrameBuffer(consoleEngine);
             rasterizer = new Rasterizer(frameBuffer);
+
+            Helpers.SetWhiteAndGrayPalette(consoleEngine);
         }
 
         private void Setup()
@@ -78,10 +80,9 @@ namespace ConsoleDummyEngine
             var triangles = mesh.GetWorldTriangles();
             foreach (var tri in triangles)
             {
-                var crossTri = Vector3D.CrossProduct(tri.p2 - tri.p1,  tri.p3 - tri.p1);
-                var cameraV = cameraVector - tri.p1 ;
-
-                var cameraDotProduct = Vector3D.DotProduct(crossTri, cameraV);
+                var cameraV = cameraVector - tri.p1;
+                cameraV.Normalize();
+                var cameraDotProduct = Vector3D.DotProduct(tri.normal, cameraV);
                 
                 if (cameraDotProduct < 0)
                     continue;
@@ -91,9 +92,9 @@ namespace ConsoleDummyEngine
                 var p3 = ProjectionPerspective(tri.p3);
                 
                 if (mesh.WireFrame)
-                    rasterizer.DrawWireframeTriangle(p1,p2,p3);
+                    rasterizer.DrawWireframeTriangle(p1, p2, p3);
                 else
-                    rasterizer.DrawFillTriangle(p1,p2,p3, tri.color);
+                    rasterizer.DrawFillTriangle(p1, p2, p3, Helpers.GetColor(cameraDotProduct), ConsoleCharacter.Full);
                 
             }
         }

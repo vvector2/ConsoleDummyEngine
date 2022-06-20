@@ -24,11 +24,11 @@ namespace ConsoleDummyEngine
             frameBuffer.Flush();
         }
 
-        public void DrawFillTriangle(Vector3D p12D, Vector3D p22D, Vector3D p32D, int color)
+        public void DrawFillTriangle(Vector3D p12D, Vector3D p22D, Vector3D p32D, int color, ConsoleCharacter consoleCharacter)
         {
-            DrawLine(p12D, p22D, color);
-            DrawLine(p22D, p32D, color);
-            DrawLine(p32D, p12D, color);
+            DrawLine(p12D, p22D, color, consoleCharacter);
+            DrawLine(p22D, p32D, color, consoleCharacter);
+            DrawLine(p32D, p12D, color, consoleCharacter);
 
             var tmpBuffer = frameBuffer.GetTmpBuffer();
 
@@ -77,14 +77,14 @@ namespace ConsoleDummyEngine
                 {
                     var zBuffer = startPixel.zBuffer * (1 - ((k - start) / len)) +
                                   endPixel.zBuffer * (k - start) / len;
-                    frameBuffer.SetPixel(new Point(k, i), zBuffer, color, ConsoleCharacter.Full);
+                    frameBuffer.SetPixel(new Point(k, i), zBuffer, color, consoleCharacter);
                 }
             }
 
             frameBuffer.Flush(minX, minY, maxX, maxY);
         }
 
-        private void DrawLine(Vector3D p1, Vector3D p2, int color = 4,
+        private void DrawLine(Vector3D p1, Vector3D p2, int color = 15,
             ConsoleCharacter consoleCharacter = ConsoleCharacter.Full)
         {
             if (p2.X - p1.X < 0)

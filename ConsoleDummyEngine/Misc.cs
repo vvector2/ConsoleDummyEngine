@@ -42,14 +42,16 @@ namespace ConsoleDummyEngine
         public Vector3D p1;
         public Vector3D p2;
         public Vector3D p3;
-        public int color;
+        public Vector3D normal;
 
-        public Triangle(Vector3D p1, Vector3D p2, Vector3D p3, int color = 0)
+        public Triangle(Vector3D p1, Vector3D p2, Vector3D p3)
         {
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
-            this.color = color;
+            
+            this.normal = Vector3D.CrossProduct(p2 - p1, p3 - p1);
+            this.normal.Normalize();
         }
 
         public Triangle Transform(Matrix3D m)
@@ -58,6 +60,10 @@ namespace ConsoleDummyEngine
             tri.p1 = m.Transform3D(tri.p1);
             tri.p2 = m.Transform3D(tri.p2);
             tri.p3 = m.Transform3D(tri.p3);
+            
+            tri.normal = m.Transform(this.normal);
+            tri.normal.Normalize();
+            
             return tri;
         }
     }
@@ -69,6 +75,25 @@ namespace ConsoleDummyEngine
 
         public static Point FloorTo2D(this Vector3D p) => new Point((int)Math.Floor(p.X), (int)Math.Floor(p.Y));
 
+        public static void SetWhiteAndGrayPalette(ConsoleEngine engine)
+        {
+            var colors = new List<Color>();
+            for (var i = 0; i < 16; i++)
+                colors.Add(new Color(255 - i * 15, 255 - i * 15, 255 - i * 15));
+
+            colors.Reverse();
+            engine.SetPalette(colors.ToArray());
+        }
+
+        public static int GetColor(double intensity)
+        {
+            intensity -= Double.Epsilon;
+            
+            var v = intensity * 16;
+            var color = (int) Math.Floor(v) ;
+            return color;
+        }
+
         public static Mesh GetBox(double size)
         {
             var a = size / 2;
@@ -77,61 +102,61 @@ namespace ConsoleDummyEngine
             var tri1 = new Triangle(
                 new Vector3D(-a, -a, -a),
                 new Vector3D(-a, a, -a),
-                new Vector3D(a, a, -a), 1);
+                new Vector3D(a, a, -a));
             var tri2 = new Triangle(
                 new Vector3D(-a, -a, -a),
                 new Vector3D(a, a, -a),
-                new Vector3D(a, -a, -a), 1);
+                new Vector3D(a, -a, -a));
 
             //top
             var tri3 = new Triangle(
                 new Vector3D(-a, a, -a),
                 new Vector3D(-a, a, a),
-                new Vector3D(a, a, a), 2);
+                new Vector3D(a, a, a));
             var tri4 = new Triangle(
                 new Vector3D(a, a, -a),
                 new Vector3D(-a, a, -a),
-                new Vector3D(a, a, a), 2);
+                new Vector3D(a, a, a));
 
             //bottom
             var tri5 = new Triangle(
                 new Vector3D(-a, -a, a),
                 new Vector3D(-a, -a, -a),
-                new Vector3D(a, -a, a), 3);
+                new Vector3D(a, -a, a));
             var tri6 = new Triangle(
                 new Vector3D(-a, -a, -a),
                 new Vector3D(a, -a, -a),
-                new Vector3D(a, -a, a), 3);
+                new Vector3D(a, -a, a));
 
             //back
             var tri7 = new Triangle(
                 new Vector3D(-a, a, a),
                 new Vector3D(-a, -a, a),
-                new Vector3D(a, a, a), 4);
+                new Vector3D(a, a, a));
             var tri8 = new Triangle(
                 new Vector3D(a, a, a),
                 new Vector3D(-a, -a, a),
-                new Vector3D(a, -a, a), 4);
+                new Vector3D(a, -a, a));
 
             // //left
             var tri9 = new Triangle(
                 new Vector3D(-a, -a, -a),
                 new Vector3D(-a, -a, a),
-                new Vector3D(-a, a, -a), 5);
+                new Vector3D(-a, a, -a));
             var tri10 = new Triangle(
                 new Vector3D(-a, -a, a),
                 new Vector3D(-a, a, a),
-                new Vector3D(-a, a, -a), 5);
+                new Vector3D(-a, a, -a));
 
             //right
             var tri11 = new Triangle(
                 new Vector3D(a, -a, a),
                 new Vector3D(a, -a, -a),
-                new Vector3D(a, a, -a), 6);
+                new Vector3D(a, a, -a));
             var tri12 = new Triangle(
                 new Vector3D(a, a, a),
                 new Vector3D(a, -a, a),
-                new Vector3D(a, a, -a), 6);
+                new Vector3D(a, a, -a));
 
             var mesh = new Mesh(new List<Triangle>()
                 { tri1, tri2, tri3, tri4, tri5, tri6, tri7, tri8, tri9, tri10, tri11, tri12 });
