@@ -52,11 +52,9 @@ namespace ConsoleDummyEngine
 
         public static int GetColor(double intensity)
         {
-            intensity -= Double.Epsilon;
-
             var v = intensity * 16;
             var color = (int)Math.Floor(v);
-            return color;
+            return color == 16 ? 15 : color;
         }
 
         public static Mesh GetBox(double size)
@@ -82,7 +80,7 @@ namespace ConsoleDummyEngine
                 new Vector3D(a, a, -a),
                 new Vector3D(-a, a, -a),
                 new Vector3D(a, a, a));
-
+            
             //bottom
             var tri5 = new Triangle(
                 new Vector3D(-a, -a, a),
@@ -92,7 +90,7 @@ namespace ConsoleDummyEngine
                 new Vector3D(-a, -a, -a),
                 new Vector3D(a, -a, -a),
                 new Vector3D(a, -a, a));
-
+            
             //back
             var tri7 = new Triangle(
                 new Vector3D(-a, a, a),
@@ -102,7 +100,7 @@ namespace ConsoleDummyEngine
                 new Vector3D(a, a, a),
                 new Vector3D(-a, -a, a),
                 new Vector3D(a, -a, a));
-
+            
             // //left
             var tri9 = new Triangle(
                 new Vector3D(-a, -a, -a),
@@ -112,7 +110,7 @@ namespace ConsoleDummyEngine
                 new Vector3D(-a, -a, a),
                 new Vector3D(-a, a, a),
                 new Vector3D(-a, a, -a));
-
+            
             //right
             var tri11 = new Triangle(
                 new Vector3D(a, -a, a),
@@ -124,7 +122,7 @@ namespace ConsoleDummyEngine
                 new Vector3D(a, a, -a));
 
             var mesh = new Mesh(new List<Triangle>()
-                { tri1, tri2, tri3, tri4, tri5, tri6, tri7, tri8, tri9, tri10, tri11, tri12 });
+                { tri1, tri2,  tri3, tri4, tri5, tri6, tri7, tri8, tri9, tri10, tri11, tri12 });
 
             return mesh;
         }

@@ -23,7 +23,6 @@ namespace ConsoleDummyEngine
         private readonly int height = 203;
         
         private readonly ConsoleEngine consoleEngine;
-        private readonly FrameBuffer frameBuffer;
         private readonly Rasterizer rasterizer;
 
         private readonly List<Mesh> meshes = new List<Mesh>();
@@ -38,9 +37,8 @@ namespace ConsoleDummyEngine
             this.height = height;
             
             consoleEngine = new ConsoleEngine(width, height, 4, 3);
-            frameBuffer = new FrameBuffer(consoleEngine);
-            rasterizer = new Rasterizer(frameBuffer);
-
+            rasterizer = new Rasterizer(consoleEngine);
+            
             Helpers.SetWhiteAndGrayPalette(consoleEngine);
         }
 
@@ -80,9 +78,7 @@ namespace ConsoleDummyEngine
             var triangles = mesh.GetWorldTriangles();
             foreach (var tri in triangles)
             {
-                var cameraV = cameraVector - tri.p1;
-                cameraV.Normalize();
-                var cameraDotProduct = Vector3D.DotProduct(tri.normal, cameraV);
+                var cameraDotProduct = Vector3D.DotProduct(tri.normal, new Vector3D(0, 0, -1));
                 
                 if (cameraDotProduct < 0)
                     continue;
@@ -92,10 +88,13 @@ namespace ConsoleDummyEngine
                 var p3 = ProjectionPerspective(tri.p3);
                 
                 if (mesh.WireFrame)
-                    rasterizer.DrawWireframeTriangle(p1, p2, p3);
+                    rasterizer.Triangle(p1, p2, p3, 15);
                 else
-                    rasterizer.DrawFillTriangle(p1, p2, p3, Helpers.GetColor(cameraDotProduct), ConsoleCharacter.Full);
-                
+                {
+                    var color = Helpers.GetColor(cameraDotProduct);
+                    rasterizer.FillTriangle(p1, p2, p3, color);
+                }
+
             }
         }
 
@@ -115,8 +114,8 @@ namespace ConsoleDummyEngine
                     DrawMesh(mesh);
                 }
 
-                frameBuffer.Render();
-                frameBuffer.ClearBuffer();
+                rasterizer.DisplayBuffer();
+                rasterizer.ClearBuffer();
             }
         }
 

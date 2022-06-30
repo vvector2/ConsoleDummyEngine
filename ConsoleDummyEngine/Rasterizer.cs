@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Media.Media3D;
 using ConsoleGameEngine;
 
@@ -8,114 +6,128 @@ namespace ConsoleDummyEngine
 {
     public class Rasterizer
     {
-        private readonly FrameBuffer frameBuffer;
+        private const int BG_COLOR = 0;
+        private const ConsoleCharacter DEFAULT_CHAR = ConsoleCharacter.Full;
+        
+        private readonly ConsoleEngine consoleEngine;
+        private readonly double[,] zBuffer;
 
-        public Rasterizer(FrameBuffer frameBuffer)
+        public Rasterizer(ConsoleEngine consoleEngine)
         {
-            this.frameBuffer = frameBuffer;
+            this.consoleEngine = consoleEngine;
+            zBuffer = new double[consoleEngine.WindowSize.X, consoleEngine.WindowSize.Y];
         }
 
-        public void DrawWireframeTriangle(Vector3D p1, Vector3D p2, Vector3D p3)
+        public void ClearBuffer()
         {
-            DrawLine(p1, p2);
-            DrawLine(p2, p3);
-            DrawLine(p3, p1);
+            for (var i = 0; i < consoleEngine.WindowSize.X; i++)
+            for (var j = 0; j < consoleEngine.WindowSize.Y; j++)
+                zBuffer[i, j] = 1;
 
-            frameBuffer.Flush();
+            consoleEngine.ClearBuffer();
         }
 
-        public void DrawFillTriangle(Vector3D p12D, Vector3D p22D, Vector3D p32D, int color, ConsoleCharacter consoleCharacter)
+        public void DisplayBuffer()
         {
-            DrawLine(p12D, p22D, color, consoleCharacter);
-            DrawLine(p22D, p32D, color, consoleCharacter);
-            DrawLine(p32D, p12D, color, consoleCharacter);
+            consoleEngine.DisplayBuffer();
+        }
 
-            var tmpBuffer = frameBuffer.GetTmpBuffer();
+        public void FillTriangle(Vector3D pa, Vector3D pb, Vector3D pc, int fgColor)
+        {
+            var a = pa.FloorTo2D();
+            var b = pb.FloorTo2D();
+            var c = pc.FloorTo2D();
 
-            var listPoint = new List<Point>();
-            for (int i = 0; i < frameBuffer.width; i++)
-            for (int j = 0; j < frameBuffer.height; j++)
-                if (tmpBuffer[i, j].set)
-                    listPoint.Add(new Point(i, j));
-            
-            if (listPoint.Count == 0)
-                return;
+            Point min = new Point(Math.Min(Math.Min(a.X, b.X), c.X), Math.Min(Math.Min(a.Y, b.Y), c.Y));
+            Point max = new Point(Math.Max(Math.Max(a.X, b.X), c.X), Math.Max(Math.Max(a.Y, b.Y), c.Y));
 
-            var minX = listPoint.Select(p => p.X).Min();
-            var minY = listPoint.Select(p => p.Y).Min();
+            var area = Orient(a, b, c);
 
-            var maxX = listPoint.Select(p => p.X).Max();
-            var maxY = listPoint.Select(p => p.Y).Max();
-
-            for (int i = minY; i <= maxY; i++)
+            Point p = new Point();
+            for (p.Y = min.Y; p.Y < max.Y; p.Y++)
             {
-                int start = -1;
-                int end = -1;
-                for (int j = minX; j <= maxX; j++)
+                for (p.X = min.X; p.X < max.X; p.X++)
                 {
-                    if (tmpBuffer[j, i].set && start == -1)
-                    {
-                        start = j;
-                        end = j;
-                        continue;
-                    }
+                    int w0 = Orient(a, b, p);
+                    int w1 = Orient(b, c, p);
+                    int w2 = Orient(c, a, p);
 
-                    if (start != -1 && tmpBuffer[j, i].set)
+                    if (w0 >= 0 && w1 >= 0 && w2 >= 0)
                     {
-                        end = j;
+                        float w0Area = (float)w0 / area;
+                        float w1Area = (float)w1 / area;
+                        float w2Area = (float)w2 / area;
+
+                        var z = w1Area * pa.Z + pb.Z * w2Area + pc.Z * w0Area;
+                        SetPixel(p, fgColor, BG_COLOR, DEFAULT_CHAR, z);
                     }
                 }
-
-                if (start == -1)
-                    continue;
-
-                var startPixel = tmpBuffer[start, i];
-                var endPixel = tmpBuffer[end, i];
-                double len = end - start + 1;
-
-                for (int k = start + 1; k < end; k++)
-                {
-                    var zBuffer = startPixel.zBuffer * (1 - ((k - start) / len)) +
-                                  endPixel.zBuffer * (k - start) / len;
-                    frameBuffer.SetPixel(new Point(k, i), zBuffer, color, consoleCharacter);
-                }
             }
-
-            frameBuffer.Flush(minX, minY, maxX, maxY);
         }
 
-        private void DrawLine(Vector3D p1, Vector3D p2, int color = 15,
-            ConsoleCharacter consoleCharacter = ConsoleCharacter.Full)
+        public void Triangle(Vector3D p1, Vector3D p2, Vector3D p3, int fgColor)
         {
-            if (p2.X - p1.X < 0)
+            Line(p1, p2, fgColor);
+            Line(p2, p3, fgColor);
+            Line(p3, p1, fgColor);
+        }
+
+        public void Line(Vector3D p1, Vector3D p2, int fgColor )
+        {
+            var start = p1.FloorTo2D();
+            var end = p2.FloorTo2D();
+
+            Point delta = end - start;
+            Point da = Point.Zero, db = Point.Zero;
+            if (delta.X < 0) da.X = -1;
+            else if (delta.X > 0) da.X = 1;
+            if (delta.Y < 0) da.Y = -1;
+            else if (delta.Y > 0) da.Y = 1;
+            if (delta.X < 0) db.X = -1;
+            else if (delta.X > 0) db.X = 1;
+            int longest = Math.Abs(delta.X);
+            int shortest = Math.Abs(delta.Y);
+
+            if (!(longest > shortest))
             {
-                Vector3D temp = p1;
-                p1 = p2;
-                p2 = temp;
+                longest = Math.Abs(delta.Y);
+                shortest = Math.Abs(delta.X);
+                if (delta.Y < 0) db.Y = -1;
+                else if (delta.Y > 0) db.Y = 1;
+                db.X = 0;
             }
-            
-            var deltaX = p2.X - p1.X;
-            var deltaY = p2.Y - p1.Y;
 
-            var deltaXAbs = Math.Abs(deltaX);
-            var deltaYAbs = Math.Abs(deltaY);
-
-            var steps = deltaXAbs > deltaYAbs ? deltaXAbs : deltaYAbs;
-
-            var incrementX = deltaX / steps;
-            var incrementY = deltaY / steps;
-
-            var currentPoint = p1;
-            for (var i = 0; i <= steps; i++)
+            int numerator = longest >> 1;
+            Point p = new Point(start.X, start.Y);
+            for (int i = 0; i <= longest; i++)
             {
-                var drawPoint = currentPoint.FloorTo2D();
-                var zBuffer = p1.Z * (1 - (i / steps)) + p2.Z * (i / steps);
-                frameBuffer.SetPixel(drawPoint, zBuffer, color, consoleCharacter);
-
-                currentPoint.X += incrementX;
-                currentPoint.Y += incrementY;
+                var z = p1.Z * (1 - (double)i / longest ) + p2.Z * i / longest;
+                SetPixel(p, fgColor, BG_COLOR, DEFAULT_CHAR, z);
+                numerator += shortest;
+                if (!(numerator < longest))
+                {
+                    numerator -= longest;
+                    p += da;
+                }
+                else
+                {
+                    p += db;
+                }
             }
-            frameBuffer.SetPixel(p2.FloorTo2D(), p2.Z, color, consoleCharacter);
+        }
+
+        private void SetPixel(Point p, int fgColor, int bgColor, ConsoleCharacter character, double z)
+        {
+            if (zBuffer[p.X, p.Y] > z && z > 0)
+            {
+                zBuffer[p.X, p.Y] = z;
+                consoleEngine.SetPixel(p, fgColor, bgColor, character);
+            }
+        }
+
+        private int Orient(Point a, Point b, Point c)
+        {
+            return ((b.X - a.X) * (c.Y - a.Y)) - ((b.Y - a.Y) * (c.X - a.X));
         }
     }
 }
