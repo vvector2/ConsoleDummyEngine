@@ -13,18 +13,18 @@ namespace ConsoleDummyEngine
             var renderer = new Renderer(203, 203);
             renderer.AddMesh(mesh);
             
-            var i = 180;
+            double i = 180;
             renderer.beforeRender += () =>
             {
                 var rotMatrix = Matrix3D.Identity;
                 
-                rotMatrix.Rotate(new Quaternion(new Vector3D(1, 0, 1), i));
+                rotMatrix.Rotate(new Quaternion(new Vector3D(0, 1, 0), i));
                 rotMatrix.Scale(new Vector3D(0.1, 0.1, 0.1));
                 rotMatrix.Translate(new Vector3D(0,0, 1));
 
                 mesh.matrix3D = rotMatrix;
                 
-                i+= 1;
+                i+= 0.1;
             };
 
             renderer.StartRender();

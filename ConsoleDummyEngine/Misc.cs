@@ -38,7 +38,7 @@ namespace ConsoleDummyEngine
         public static Vector3D Transform3D(this Matrix3D m, Vector3D v) =>
             m.Transform(v) + new Vector3D(m.OffsetX, m.OffsetY, m.OffsetZ);
 
-        public static Point FloorTo2D(this Vector3D p) => new Point((int)Math.Floor(p.X), (int)Math.Floor(p.Y));
+        public static Point RoundTo2D(this Vector3D p) => new Point((int)Math.Round(p.X), (int)Math.Round(p.Y));
 
         public static void SetWhiteAndGrayPalette(ConsoleEngine engine)
         {

@@ -19,23 +19,6 @@ namespace ConsoleDummyEngine
         public IEnumerable<Triangle> GetWorldTriangles() => triangles.Select(tri => tri.Transform(matrix3D));
     }
 
-    public struct PixelInfo
-    {
-        public PixelInfo(float zBuffer, int color, ConsoleCharacter consoleCharacter = ConsoleCharacter.Full)
-        {
-            this.zBuffer = zBuffer;
-            this.color = color;
-            this.consoleCharacter = consoleCharacter;
-            set = false;
-        }
-
-        public bool set;
-        public double zBuffer;
-        public int color;
-        public ConsoleCharacter consoleCharacter;
-    }
-
-
     public struct Triangle
     {
         public Vector3D p1;

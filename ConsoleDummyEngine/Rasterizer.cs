@@ -7,6 +7,7 @@ namespace ConsoleDummyEngine
     public class Rasterizer
     {
         private const int BG_COLOR = 0;
+        private const double Z_BUFFER_EPS = 10e-10;
         private const ConsoleCharacter DEFAULT_CHAR = ConsoleCharacter.Full;
         
         private readonly ConsoleEngine consoleEngine;
@@ -34,9 +35,9 @@ namespace ConsoleDummyEngine
 
         public void FillTriangle(Vector3D pa, Vector3D pb, Vector3D pc, int fgColor)
         {
-            var a = pa.FloorTo2D();
-            var b = pb.FloorTo2D();
-            var c = pc.FloorTo2D();
+            var a = pa.RoundTo2D();
+            var b = pb.RoundTo2D();
+            var c = pc.RoundTo2D();
 
             Point min = new Point(Math.Min(Math.Min(a.X, b.X), c.X), Math.Min(Math.Min(a.Y, b.Y), c.Y));
             Point max = new Point(Math.Max(Math.Max(a.X, b.X), c.X), Math.Max(Math.Max(a.Y, b.Y), c.Y));
@@ -74,8 +75,8 @@ namespace ConsoleDummyEngine
 
         public void Line(Vector3D p1, Vector3D p2, int fgColor )
         {
-            var start = p1.FloorTo2D();
-            var end = p2.FloorTo2D();
+            var start = p1.RoundTo2D();
+            var end = p2.RoundTo2D();
 
             Point delta = end - start;
             Point da = Point.Zero, db = Point.Zero;
@@ -118,7 +119,7 @@ namespace ConsoleDummyEngine
 
         private void SetPixel(Point p, int fgColor, int bgColor, ConsoleCharacter character, double z)
         {
-            if (zBuffer[p.X, p.Y] > z && z > 0)
+            if (zBuffer[p.X, p.Y] - z > Z_BUFFER_EPS && z > 0)
             {
                 zBuffer[p.X, p.Y] = z;
                 consoleEngine.SetPixel(p, fgColor, bgColor, character);
