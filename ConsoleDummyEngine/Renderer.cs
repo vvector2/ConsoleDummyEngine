@@ -19,23 +19,25 @@ namespace ConsoleDummyEngine
 
         private const double FOE = 80;
         
-        private readonly int width = 203;
-        private readonly int height = 203;
+        private readonly int width;
+        private readonly int height;
         
+        private readonly ICamera camera;
+
         private readonly ConsoleEngine consoleEngine;
         private readonly Rasterizer rasterizer;
 
         private readonly List<Mesh> meshes = new List<Mesh>();
-
-        private readonly Vector3D cameraVector = new Vector3D();
         
         public delegate void BeforeRender();
         public BeforeRender beforeRender;
-        public Renderer(int width, int height)
+        
+        public Renderer(int width, int height, ICamera camera)
         {
             this.width = width;
             this.height = height;
-            
+            this.camera = camera;
+
             consoleEngine = new ConsoleEngine(width, height, 4, 3);
             rasterizer = new Rasterizer(consoleEngine);
             
@@ -47,30 +49,10 @@ namespace ConsoleDummyEngine
             consoleEngine.Borderless();
         }
         
-        private Vector3D ProjectionOrthographic(Vector3D p)
+        private Vector3D Projection(Vector3D p)
         {
-            var xClip = p.X;
-            var yClip = p.Y;
-            var zClip = (p.Z - NEAR) / (FAR - NEAR);
-            
-            var xNdc = 0.5 + xClip / ((RIGHT - LEFT) / 2);
-            var yNdc = 0.5 - yClip / ((TOP - BOTTOM) / 2);
-
-            return new Vector3D(xNdc * width, yNdc * height, zClip);
-        }
-        
-        private Vector3D ProjectionPerspective(Vector3D p)
-        {
-            var xClip = NEAR * p.X / p.Z;
-            var yClip = NEAR * p.Y / p.Z;
-            var zClip = (FAR * p.Z - FAR * NEAR )  / (FAR - NEAR) / p.Z;
-            
-            var halfFrustumSquare = Math.Tan(FOE / 2 * Math.PI / 180) * NEAR;
-            
-            var xNdc = 0.5 + xClip / halfFrustumSquare;
-            var yNdc = 0.5 - yClip / halfFrustumSquare;
-
-            return new Vector3D(xNdc * width, yNdc * height, zClip);
+            var ndc = camera.Project(p);
+            return new Vector3D(ndc.X * width, ndc.Y * height, ndc.Z);
         }
 
         private void DrawMesh(Mesh mesh)
@@ -83,9 +65,9 @@ namespace ConsoleDummyEngine
                 if (cameraDotProduct < 0)
                     continue;
 
-                var p1 = ProjectionPerspective(tri.p1);
-                var p2 = ProjectionPerspective(tri.p2);
-                var p3 = ProjectionPerspective(tri.p3);
+                var p1 = Projection(tri.p1);
+                var p2 = Projection(tri.p2);
+                var p3 = Projection(tri.p3);
                 
                 if (mesh.WireFrame)
                     rasterizer.Triangle(p1, p2, p3, 15);

@@ -8,9 +8,9 @@ namespace ConsoleDummyEngine
     {
         public static void Main(string[] args)
         {
-            //var mesh = Helpers.ReadObjFile("assets/al.obj");
-            var mesh = Helpers.GetBox(1);
-            var renderer = new Renderer(203, 203);
+            var mesh = Helpers.ReadObjFile("assets/al.obj");
+            //var mesh = Helpers.GetBox(1);
+            var renderer = new Renderer(203, 203, new PerspectiveCamera());
             renderer.AddMesh(mesh);
             
             double i = 180;
@@ -24,7 +24,7 @@ namespace ConsoleDummyEngine
 
                 mesh.matrix3D = rotMatrix;
                 
-                i+= 0.1;
+                i+= 1;
             };
 
             renderer.StartRender();
