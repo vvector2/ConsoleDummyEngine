@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows.Media.Media3D;
@@ -9,28 +10,14 @@ namespace ConsoleDummyEngine
 {
     public class Renderer
     {
-        private const double FAR = 50;
-        private const double NEAR = 0.1;
-        
-        private const double LEFT = -2;
-        private const double RIGHT = 2;
-        private const double TOP = 1.5;
-        private const double BOTTOM = -1.5;
-
-        private const double FOE = 80;
-        
         private readonly int width;
         private readonly int height;
         
-        private readonly ICamera camera;
-
-        private readonly ConsoleEngine consoleEngine;
-        private readonly Rasterizer rasterizer;
-
-        private readonly List<Mesh> meshes = new List<Mesh>();
+        protected readonly ICamera camera;
+        protected readonly ConsoleEngine consoleEngine;
+        protected readonly List<Mesh> meshes = new List<Mesh>();
         
-        public delegate void BeforeRender();
-        public BeforeRender beforeRender;
+        private readonly Rasterizer rasterizer;
         
         public Renderer(int width, int height, ICamera camera)
         {
@@ -42,11 +29,6 @@ namespace ConsoleDummyEngine
             rasterizer = new Rasterizer(consoleEngine);
             
             Helpers.SetWhiteAndGrayPalette(consoleEngine);
-        }
-
-        private void Setup()
-        {
-            consoleEngine.Borderless();
         }
         
         private Vector3D Projection(Vector3D p)
@@ -80,6 +62,15 @@ namespace ConsoleDummyEngine
             }
         }
 
+        protected virtual void BeforeRender()
+        {
+        }
+        
+        protected virtual void Setup()
+        {
+            consoleEngine.Borderless();
+        }
+
         public void AddMesh(params Mesh[] mesh)
         {
             meshes.AddRange(mesh);
@@ -90,7 +81,7 @@ namespace ConsoleDummyEngine
             Setup();
             while (true)
             {
-                beforeRender();
+                BeforeRender();
                 foreach (var mesh in meshes)
                 {
                     DrawMesh(mesh);

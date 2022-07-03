@@ -8,26 +8,40 @@ namespace ConsoleDummyEngine
     {
         public static void Main(string[] args)
         {
-            var mesh = Helpers.ReadObjFile("assets/al.obj");
-            //var mesh = Helpers.GetBox(1);
-            var renderer = new Renderer(203, 203, new PerspectiveCamera());
-            renderer.AddMesh(mesh);
-            
-            double i = 180;
-            renderer.beforeRender += () =>
-            {
-                var rotMatrix = Matrix3D.Identity;
-                
-                rotMatrix.Rotate(new Quaternion(new Vector3D(0, 1, 0), i));
-                rotMatrix.Scale(new Vector3D(0.1, 0.1, 0.1));
-                rotMatrix.Translate(new Vector3D(0,0, 1));
-
-                mesh.matrix3D = rotMatrix;
-                
-                i+= 1;
-            };
-
+            var renderer = new MyGame(203, 203, new PerspectiveCamera());
             renderer.StartRender();
+        }
+    }
+
+    public class MyGame : Renderer
+    {
+        private int i = 0;
+        public MyGame(int width, int height, ICamera camera) : base(width, height, camera)
+        {
+        }
+        
+        protected override void Setup()
+        {
+            base.Setup();
+            var mesh = Helpers.GetBox(1);
+            //var mesh = Helpers.ReadObjFile("assets/al.obj");
+            AddMesh(mesh);
+        }
+
+        protected override void BeforeRender()
+        {
+            base.BeforeRender();
+            
+            var mesh = this.meshes[0];
+            var rotMatrix = Matrix3D.Identity;
+
+            rotMatrix.Rotate(new Quaternion(new Vector3D(0, 1, 0), i));
+            rotMatrix.Scale(new Vector3D(0.1, 0.1, 0.1));
+            rotMatrix.Translate(new Vector3D(0, 0, 1));
+
+            mesh.Matrix3D = rotMatrix;
+
+            i++;
         }
     }
 }

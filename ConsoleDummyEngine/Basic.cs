@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Media.Media3D;
 using ConsoleGameEngine;
@@ -7,16 +8,18 @@ namespace ConsoleDummyEngine
 {
     public class Mesh
     {
-        private readonly IEnumerable<Triangle> triangles;
-        public Matrix3D matrix3D = Matrix3D.Identity;
+        public Matrix3D Matrix3D { get; set; } = Matrix3D.Identity;
         public bool WireFrame { get; set; }
+        private readonly IEnumerable<Triangle> triangles;
+        public readonly Guid Id;
 
         public Mesh(IEnumerable<Triangle> triangles)
         {
             this.triangles = triangles;
+            Id = Guid.NewGuid();
         }
 
-        public IEnumerable<Triangle> GetWorldTriangles() => triangles.Select(tri => tri.Transform(matrix3D));
+        public IEnumerable<Triangle> GetWorldTriangles() => triangles.Select(tri => tri.Transform(Matrix3D));
     }
 
     public struct Triangle
