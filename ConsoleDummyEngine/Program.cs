@@ -8,7 +8,7 @@ namespace ConsoleDummyEngine
     {
         public static void Main(string[] args)
         {
-            var renderer = new MyGame(203, 203, new PerspectiveCamera());
+            var renderer = new MyGame(203, 203, new OrthographicCamera());
             renderer.StartRender();
         }
     }
@@ -23,8 +23,9 @@ namespace ConsoleDummyEngine
         protected override void Setup()
         {
             base.Setup();
-            var mesh = Helpers.GetBox(1);
-            //var mesh = Helpers.ReadObjFile("assets/al.obj");
+            // var mesh = Helpers.GetBox(1);
+            // mesh.WireFrame = false;
+            var mesh = Helpers.ReadObjFile("assets/al.obj");
             AddMesh(mesh);
         }
 
@@ -35,9 +36,9 @@ namespace ConsoleDummyEngine
             var mesh = this.meshes[0];
             var rotMatrix = Matrix3D.Identity;
 
-            rotMatrix.Rotate(new Quaternion(new Vector3D(0, 1, 0), i));
-            rotMatrix.Scale(new Vector3D(0.1, 0.1, 0.1));
-            rotMatrix.Translate(new Vector3D(0, 0, 1));
+            rotMatrix.Rotate(new Quaternion(new Vector3D(1, 1, 1), i));
+            rotMatrix.Scale(new Vector3D(0.3, 0.3, 0.3));
+            rotMatrix.Translate(new Vector3D(0, 0, 1.5));
 
             mesh.Matrix3D = rotMatrix;
 

@@ -57,72 +57,89 @@ namespace ConsoleDummyEngine
             return color == 16 ? 15 : color;
         }
 
+        public static double CalcSignedDistanceBetweenPlaneAndPoint(Vector3D planeNormal, Vector3D planePoint, Vector3D point)
+        {
+            var v = point - planePoint;
+            return Vector3D.DotProduct(planeNormal, v);
+        }
+        
+        public static Vector3D IntersectPoint(Vector3D lineStart, Vector3D lineEnd, Vector3D planeNormal, Vector3D planePoint)
+        {
+            var planeD = -Vector3D.DotProduct(planeNormal, planePoint);
+            var ad = Vector3D.DotProduct(lineStart, planeNormal);
+            var bd = Vector3D.DotProduct(lineEnd, planeNormal);
+            var t = (-planeD - ad) / (bd - ad);
+            var lineStartToEnd = lineEnd - lineStart;
+            var lineToIntersect = lineStartToEnd * t;
+            return lineStart + lineToIntersect;
+        }
+
         public static Mesh GetBox(double size)
         {
             var a = size / 2;
 
             //front
-            var tri1 = new Triangle(
-                new Vector3D(-a, -a, -a),
-                new Vector3D(-a, a, -a),
-                new Vector3D(a, a, -a));
-            var tri2 = new Triangle(
-                new Vector3D(-a, -a, -a),
-                new Vector3D(a, a, -a),
-                new Vector3D(a, -a, -a));
+             var tri1 = new Triangle(
+                 new Vector3D(-a, -a, -a),
+                 new Vector3D(-a, a, -a),
+                 new Vector3D(a, a, -a));
+             var tri2 = new Triangle(
+                 new Vector3D(-a, -a, -a),
+                 new Vector3D(a, a, -a),
+                 new Vector3D(a, -a, -a));
 
             //top
-            var tri3 = new Triangle(
-                new Vector3D(-a, a, -a),
-                new Vector3D(-a, a, a),
-                new Vector3D(a, a, a));
-            var tri4 = new Triangle(
-                new Vector3D(a, a, -a),
-                new Vector3D(-a, a, -a),
-                new Vector3D(a, a, a));
+             var tri3 = new Triangle(
+                 new Vector3D(-a, a, -a),
+                 new Vector3D(-a, a, a),
+                 new Vector3D(a, a, a));
+             var tri4 = new Triangle(
+                 new Vector3D(a, a, -a),
+                 new Vector3D(-a, a, -a),
+                 new Vector3D(a, a, a));
             
-            //bottom
-            var tri5 = new Triangle(
-                new Vector3D(-a, -a, a),
-                new Vector3D(-a, -a, -a),
-                new Vector3D(a, -a, a));
-            var tri6 = new Triangle(
-                new Vector3D(-a, -a, -a),
-                new Vector3D(a, -a, -a),
-                new Vector3D(a, -a, a));
+             //bottom
+             var tri5 = new Triangle(
+                 new Vector3D(-a, -a, a),
+                 new Vector3D(-a, -a, -a),
+                 new Vector3D(a, -a, a));
+             var tri6 = new Triangle(
+                 new Vector3D(-a, -a, -a),
+                 new Vector3D(a, -a, -a),
+                 new Vector3D(a, -a, a));
             
-            //back
-            var tri7 = new Triangle(
-                new Vector3D(-a, a, a),
-                new Vector3D(-a, -a, a),
-                new Vector3D(a, a, a));
-            var tri8 = new Triangle(
-                new Vector3D(a, a, a),
-                new Vector3D(-a, -a, a),
-                new Vector3D(a, -a, a));
+             //back
+             var tri7 = new Triangle(
+                 new Vector3D(-a, a, a),
+                 new Vector3D(-a, -a, a),
+                 new Vector3D(a, a, a));
+             var tri8 = new Triangle(
+                 new Vector3D(a, a, a),
+                 new Vector3D(-a, -a, a),
+                 new Vector3D(a, -a, a));
             
-            // //left
-            var tri9 = new Triangle(
-                new Vector3D(-a, -a, -a),
-                new Vector3D(-a, -a, a),
-                new Vector3D(-a, a, -a));
-            var tri10 = new Triangle(
-                new Vector3D(-a, -a, a),
-                new Vector3D(-a, a, a),
-                new Vector3D(-a, a, -a));
-            
-            //right
-            var tri11 = new Triangle(
-                new Vector3D(a, -a, a),
-                new Vector3D(a, -a, -a),
-                new Vector3D(a, a, -a));
-            var tri12 = new Triangle(
-                new Vector3D(a, a, a),
-                new Vector3D(a, -a, a),
-                new Vector3D(a, a, -a));
+             // //left
+             var tri9 = new Triangle(
+                 new Vector3D(-a, -a, -a),
+                 new Vector3D(-a, -a, a),
+                 new Vector3D(-a, a, -a));
+             var tri10 = new Triangle(
+                 new Vector3D(-a, -a, a),
+                 new Vector3D(-a, a, a),
+                 new Vector3D(-a, a, -a));
+             
+             //right
+             var tri11 = new Triangle(
+                 new Vector3D(a, -a, a),
+                 new Vector3D(a, -a, -a),
+                 new Vector3D(a, a, -a));
+             var tri12 = new Triangle(
+                 new Vector3D(a, a, a),
+                 new Vector3D(a, -a, a),
+                 new Vector3D(a, a, -a));
 
             var mesh = new Mesh(new List<Triangle>()
-                { tri1, tri2,  tri3, tri4, tri5, tri6, tri7, tri8, tri9, tri10, tri11, tri12 });
+                {tri1, tri2, tri3, tri4, tri5, tri6, tri7, tri8, tri9, tri10, tri11, tri12 });
 
             return mesh;
         }

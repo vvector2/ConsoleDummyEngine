@@ -22,6 +22,12 @@ namespace ConsoleDummyEngine
         public IEnumerable<Triangle> GetWorldTriangles() => triangles.Select(tri => tri.Transform(Matrix3D));
     }
 
+    public struct Plane
+    {
+        public Vector3D P;
+        public Vector3D N;
+    }
+
     public struct Triangle
     {
         public Vector3D p1;
@@ -34,7 +40,7 @@ namespace ConsoleDummyEngine
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
-            
+
             this.normal = Vector3D.CrossProduct(p2 - p1, p3 - p1);
             this.normal.Normalize();
         }
@@ -45,12 +51,11 @@ namespace ConsoleDummyEngine
             tri.p1 = m.Transform3D(tri.p1);
             tri.p2 = m.Transform3D(tri.p2);
             tri.p3 = m.Transform3D(tri.p3);
-            
+
             tri.normal = m.Transform(this.normal);
             tri.normal.Normalize();
-            
+
             return tri;
         }
     }
-
 }

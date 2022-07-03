@@ -119,7 +119,10 @@ namespace ConsoleDummyEngine
 
         private void SetPixel(Point p, int fgColor, int bgColor, ConsoleCharacter character, double z)
         {
-            if (zBuffer[p.X, p.Y] - z > Z_BUFFER_EPS && z > 0)
+            if (p.X >= consoleEngine.WindowSize.X || p.Y >= consoleEngine.WindowSize.Y || p.X < 0 || p.Y < 0)
+                return;
+            
+            if ( zBuffer[p.X, p.Y] - z > Z_BUFFER_EPS && z > 0)
             {
                 zBuffer[p.X, p.Y] = z;
                 consoleEngine.SetPixel(p, fgColor, bgColor, character);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Media.Media3D;
 
 namespace ConsoleDummyEngine
@@ -7,6 +8,7 @@ namespace ConsoleDummyEngine
     {
         Matrix3D Matrix { get; set; }
         Vector3D Project(Vector3D p);
+        IEnumerable<Plane> getClippingPlanes();
     }
 
     public class PerspectiveCamera : ICamera
@@ -34,6 +36,11 @@ namespace ConsoleDummyEngine
             var yNdc = 0.5 - yClip / halfFrustumSquare;
 
             return new Vector3D(xNdc, yNdc, zClip);
+        }
+
+        public IEnumerable<Plane> getClippingPlanes()
+        {
+            throw new NotImplementedException();
         }
     }
     
@@ -64,6 +71,19 @@ namespace ConsoleDummyEngine
             var yNdc = 0.5 - yClip / ((TOP - BOTTOM) / 2);
 
             return new Vector3D(xNdc ,yNdc , zClip);
+        }
+
+        public IEnumerable<Plane> getClippingPlanes()
+        {
+            return new []
+            {
+                new Plane() { N = new Vector3D(0, 0, 1), P = new Vector3D(0, 0, NEAR) },
+                new Plane() { N = new Vector3D(0, 0, -1), P = new Vector3D(0, 0, FAR) },
+                new Plane() { N = new Vector3D(1, 0, 0), P = new Vector3D(LEFT + 1.5, 0, NEAR) },
+                new Plane() { N = new Vector3D(-1, 0, 0), P = new Vector3D(RIGHT - 1.5, 0, NEAR) },
+                new Plane() { N = new Vector3D(0, 1, 0), P = new Vector3D(0, BOTTOM + 1, NEAR) },
+                new Plane() { N = new Vector3D(0, -1, 0), P = new Vector3D(0, TOP - 1, NEAR) },
+            };
         }
     }
 }
