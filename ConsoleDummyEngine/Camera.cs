@@ -8,7 +8,7 @@ namespace ConsoleDummyEngine
     {
         Matrix3D Matrix { get; set; }
         Vector3D Project(Vector3D p);
-        IEnumerable<Plane> getClippingPlanes();
+        Plane[] GetClippingPlanes();
     }
 
     public class PerspectiveCamera : ICamera
@@ -38,7 +38,7 @@ namespace ConsoleDummyEngine
             return new Vector3D(xNdc, yNdc, zClip);
         }
 
-        public IEnumerable<Plane> getClippingPlanes()
+        public Plane[] GetClippingPlanes()
         {
             throw new NotImplementedException();
         }
@@ -54,6 +54,16 @@ namespace ConsoleDummyEngine
         private const double TOP = 1.5;
         private const double BOTTOM = -1.5;
         
+        private readonly Plane[] planes = new []
+        {
+            new Plane() { N = new Vector3D(0, 0, 1), P = new Vector3D(0, 0, NEAR) },
+            new Plane() { N = new Vector3D(0, 0, -1), P = new Vector3D(0, 0, FAR) },
+            new Plane() { N = new Vector3D(1, 0, 0), P = new Vector3D(LEFT, 0, NEAR) },
+            new Plane() { N = new Vector3D(-1, 0, 0), P = new Vector3D(RIGHT , 0, NEAR) },
+            new Plane() { N = new Vector3D(0, 1, 0), P = new Vector3D(0, BOTTOM , NEAR) },
+            new Plane() { N = new Vector3D(0, -1, 0), P = new Vector3D(0, TOP, NEAR) },
+        }; 
+
         public Matrix3D Matrix { get; set; } = Matrix3D.Identity;
         
         public OrthographicCamera()
@@ -73,17 +83,6 @@ namespace ConsoleDummyEngine
             return new Vector3D(xNdc ,yNdc , zClip);
         }
 
-        public IEnumerable<Plane> getClippingPlanes()
-        {
-            return new []
-            {
-                new Plane() { N = new Vector3D(0, 0, 1), P = new Vector3D(0, 0, NEAR) },
-                new Plane() { N = new Vector3D(0, 0, -1), P = new Vector3D(0, 0, FAR) },
-                new Plane() { N = new Vector3D(1, 0, 0), P = new Vector3D(LEFT + 1.5, 0, NEAR) },
-                new Plane() { N = new Vector3D(-1, 0, 0), P = new Vector3D(RIGHT - 1.5, 0, NEAR) },
-                new Plane() { N = new Vector3D(0, 1, 0), P = new Vector3D(0, BOTTOM + 1, NEAR) },
-                new Plane() { N = new Vector3D(0, -1, 0), P = new Vector3D(0, TOP - 1, NEAR) },
-            };
-        }
+        public Plane[] GetClippingPlanes() => planes;
     }
 }

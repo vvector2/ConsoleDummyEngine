@@ -33,6 +33,9 @@ namespace ConsoleDummyEngine
             return new Mesh(tris);
         }
 
+        public static Vector3D Up(this Matrix3D m) => new Vector3D(m.M21, m.M22, m.M23);
+        public static Vector3D Offset(this Matrix3D m) => new Vector3D(m.OffsetX, m.OffsetY, m.OffsetZ);
+        
         public static Vector3D ToBaseVector3D(this Vertex v) => new Vector3D(v.X, v.Y, v.Z);
 
         public static Vector3D Transform3D(this Matrix3D m, Vector3D v) =>

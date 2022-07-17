@@ -40,7 +40,7 @@ namespace ConsoleDummyEngine
         private List<Triangle> ClipTriangles(IEnumerable<Triangle> triangles)
         {
             var trianglesList = triangles.ToList();
-            var planes = camera.getClippingPlanes();
+            var planes = camera.GetClippingPlanes();
             foreach (var plane in planes)
             {
                 var trisCopy = trianglesList.ToArray();
@@ -52,7 +52,7 @@ namespace ConsoleDummyEngine
 
                     var d1 = Helpers.CalcSignedDistanceBetweenPlaneAndPoint(plane.N, plane.P, tri.p1);
                     var d2 = Helpers.CalcSignedDistanceBetweenPlaneAndPoint(plane.N, plane.P, tri.p2);
-                    var d3 =Helpers.CalcSignedDistanceBetweenPlaneAndPoint(plane.N, plane.P, tri.p3);
+                    var d3 = Helpers.CalcSignedDistanceBetweenPlaneAndPoint(plane.N, plane.P, tri.p3);
 
                     if (d1 >= 0)
                         insidePoint.Add(tri.p1);
@@ -110,10 +110,18 @@ namespace ConsoleDummyEngine
             return trianglesList;
         }
 
+        private IEnumerable<Triangle> ToEyeTriangle(IEnumerable<Triangle> tris)
+        {
+            var inverseCameraMatrix = camera.Matrix;
+            inverseCameraMatrix.Invert();
+            return tris.Select(t => t.Transform(inverseCameraMatrix));
+        } 
+
         private void DrawMesh(Mesh mesh)
         {
             var triangles = mesh.GetWorldTriangles();
-            var clippedTris = ClipTriangles(triangles);
+            var eyeTriangles = ToEyeTriangle(triangles);
+            var clippedTris = ClipTriangles(eyeTriangles);
             
             foreach (var tri in clippedTris)
             {
