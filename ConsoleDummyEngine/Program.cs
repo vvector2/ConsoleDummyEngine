@@ -10,7 +10,7 @@ namespace ConsoleDummyEngine
     {
         public static void Main(string[] args)
         {
-            var renderer = new MyGame(203, 203, new OrthographicCamera());
+            var renderer = new MyGame(86, 86, new OrthographicCamera());
             renderer.StartRender();
         }
     }
